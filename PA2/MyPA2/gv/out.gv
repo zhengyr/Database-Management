@@ -1,0 +1,27 @@
+digraph {
+	"AFRICA" -> "AFRICA"[label="$271M"];
+	"AFRICA" -> "AMERICA"[label="$211M"];
+	"AFRICA" -> "ASIA"[label="$321M"];
+	"AFRICA" -> "EUROPE"[label="$311M"];
+	"AFRICA" -> "MIDDLE EAST"[label="$224M"];
+	"AMERICA" -> "AFRICA"[label="$269M"];
+	"AMERICA" -> "AMERICA"[label="$199M"];
+	"AMERICA" -> "ASIA"[label="$304M"];
+	"AMERICA" -> "EUROPE"[label="$300M"];
+	"AMERICA" -> "MIDDLE EAST"[label="$214M"];
+	"ASIA" -> "AFRICA"[label="$254M"];
+	"ASIA" -> "AMERICA"[label="$190M"];
+	"ASIA" -> "ASIA"[label="$298M"];
+	"ASIA" -> "EUROPE"[label="$288M"];
+	"ASIA" -> "MIDDLE EAST"[label="$209M"];
+	"EUROPE" -> "AFRICA"[label="$258M"];
+	"EUROPE" -> "AMERICA"[label="$195M"];
+	"EUROPE" -> "ASIA"[label="$301M"];
+	"EUROPE" -> "EUROPE"[label="$296M"];
+	"EUROPE" -> "MIDDLE EAST"[label="$208M"];
+	"MIDDLE EAST" -> "AFRICA"[label="$261M"];
+	"MIDDLE EAST" -> "AMERICA"[label="$191M"];
+	"MIDDLE EAST" -> "ASIA"[label="$294M"];
+	"MIDDLE EAST" -> "EUROPE"[label="$294M"];
+	"MIDDLE EAST" -> "MIDDLE EAST"[label="$208M"];
+}

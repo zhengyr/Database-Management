@@ -1,0 +1,185 @@
+--Zhibo Peng
+-- 1.
+
+INSERT INTO periods 
+SELECT day, per
+FROM assigned
+GROUP BY day, per
+ORDER BY day, per;
+
+select * from periods;
+
+-- 2. 
+INSERT INTO teachers 
+SELECT A.tname AS tname, SUM(B.nper) AS tload
+FROM taught_by AS A, courses AS B
+WHERE A.cno = B.cno
+GROUP BY tname
+ORDER BY tname;
+select * from teachers;
+
+--3.
+SELECT B.day AS day, B.per AS per, A.cno AS cno
+FROM taught_by AS A, assigned AS B
+WHERE A.cno = B.cno AND A.tname = 'Marsalis'
+ORDER BY day, per;
+
+-- 4.
+update assigned
+set per = 4
+where cno = 10 and day = 'B' and per = 2;
+
+SELECT B.day AS day, B.per AS per, A.cno AS cno
+FROM taught_by AS A, assigned AS B
+WHERE A.cno = B.cno AND A.tname = 'Marsalis'
+ORDER BY day, per;
+
+-- 5.
+select a.day as day, a.per as per, b.cno as cno
+from assigned as a, taught_to as b
+where a.cno = b.cno and (b.hr = 'B' or b.hr = 'Z') and b.grade = 11
+order by day, per;
+
+-- 6.
+update assigned
+set per = 2
+where cno in (select cno from courses where subj = 'Mat') and day = 'B' and per = 4;
+
+select * from assigned order by cno, day, per;
+
+-- 7.
+
+select a.tname as a, c.day as day, c.per as per, d.subj as subj, b.grade as grade, b.hr as hr
+from taught_by as a, taught_to as b, assigned as c, courses as d          
+where a.cno = b.cno and b.cno = c.cno and c.cno = d.cno              
+order by tname, day, per;
+
+-- 8.
+
+select a.grade as grade, d.hr as hr, b.day as day, b.per as per, c.subj as subj
+from taught_to as a, assigned as b, courses as c, grades as d
+where a.cno = b.cno and b.cno = c.cno and ((a.hr='Z' and a.grade = d.grade) or d.hr = a.hr)
+group by a.grade, d.hr, b.day, b.per, c.subj
+order by grade, hr, day, per;   
+
+
+-- 9.
+select a.tname as tname, b.day as day, b.per as per
+from taught_by as a, assigned as b, taught_by as c, assigned as d
+where a.cno = b.cno and c.cno = d.cno and b.day = d.day and b.per = d.per and a.tname = c.tname and not(a.cno = c.cno)
+group by a.tname, b.day, b.per;
+
+
+-- 10.
+select b.grade as grade, b.hr as hr, a.day as day, a.per as per
+from assigned as a, assigned as c, taught_to as b, taught_to as d
+where a.cno = b.cno and c.cno = d.cno and b.grade = d.grade and ((not(b.hr = 'Z') and  d.hr = 'Z') or b.hr = d.hr) and a.day = c.day and a.per = c.per and not(a.cno = c.cno)
+group by a.day, a.per, b.grade, b.hr
+order by b.grade, b.hr, a.day, a.per;     
+
+-- 11.
+select b.cno, a.day, a.per
+from assigned as a, assigned as b
+where a.cno = b.cno and a.day = b.day and not(a.per = b.per)
+GROUP BY b.cno, a.day, a.per
+order by cno;
+
+-- 12.
+select b.cno as cno, (a.nper-count(b.cno)) as counts
+from courses as a, assigned as b
+where a.cno = b.cno
+GROUP BY a.nper, b.cno
+having a.nper > count(b.cno)
+order by cno, counts;
+
+
+-- 13.
+select a.tname as tname, b.subj as subj
+from taught_by as a, courses as b
+where a.cno = b.cno and not exists(
+select *
+from taught_by as c, courses as d
+where c.cno = d.cno and not(d.subj = b.subj) and a.tname = c.tname)
+group by a.tname, b.subj
+order by tname;
+
+-- 14.
+select tname, a.cno, day, per
+into temp
+from taught_by as a, assigned as b
+where a.cno = b.cno
+order by tname, day, per;
+
+select a.tname as tname, a.day as day, (b.per-a.per-1) as windows_count_per_day
+into windows
+from temp as a, temp as b
+where a.tname = b.tname and a.day = b.day and b.per > a.per+1 and not exists(select * from temp as c where c.tname = a.tname and c.day = a.day and c.per = a.per+1)
+group by a.tname, a.day, b.per, a.per
+order by a.tname;
+
+select * from windows;
+drop table temp;
+
+-- 15.
+
+select teachers.tname, sum(windows_count_per_day) as windows_count_total
+into totalwindows
+from windows right outer join teachers on teachers.tname = windows.tname
+group by teachers.tname;
+
+update totalwindows
+set windows_count_total = 0
+where windows_count_total is null;
+
+select * from totalwindows
+order by tname;
+
+drop table totalwindows;
+
+-- 16.
+select sum(windows_count_per_day) as total from windows;
+
+drop table windows;
+
+-- 17.
+(select a.cno as cno, b.day as day, b.per as per
+from courses as a, taught_by as c, assigned as b, taught_by as d
+where a.cno = c.cno and b.cno = d.cno and not(a.cno = d.cno) and c.tname = d.tname
+group by a.cno, b.day, b.per
+order by a.cno, b.day, b.per)
+except
+select cno, day, per from assigned;
+
+
+-- 18.
+(select a.cno as cno, b.day as day, b.per as per
+from taught_to as a, assigned as b, taught_to as c
+where b.cno = c.cno and not(a.cno = c.cno) and ((a.hr = 'Z' or c.hr = 'Z') or a.hr = c.hr) and a.grade = c.grade
+group by a.cno, b.day, b.per
+order by a.cno, b.day, b.per)
+except
+select cno, day, per from assigned;
+
+
+-- 19.
+select a.tname as tname, b.day as day, b.per as per, c.subj as subj ,d.grade as grade, d.hr as hr
+into teaching_schedule
+From taught_by as a, assigned as b, courses as c, taught_to as d
+where a.cno=b.cno and a.cno=c.cno and a.cno=d.cno
+order by tname, day, per;
+
+select tname as tname, day as day, count(per) as num
+into periods_per_day
+from teaching_schedule 
+group by tname, day
+order by tname;
+
+select a.tname as tname, a.day as day, a.num as maxnum
+from periods_per_day as a
+where not exists(select b.tname as tname from periods_per_day as b where b.tname = a.tname and b.num > a.num)
+group by a.tname, a.day, a.num
+order by tname, day;
+
+drop table teaching_schedule;
+drop table periods_per_day;
+

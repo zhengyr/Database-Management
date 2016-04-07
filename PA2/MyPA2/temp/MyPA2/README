@@ -1,0 +1,10 @@
+COSI127B - PA2 Files
+====================
+- makefile to ease setup and compilation
+- lib/jdbc.jar - The Postgres database driver
+- lib/pa2.jar - The collection of API’s for Gnuplot, Graphviz, and LaTex
+- docs/index.html - Javadoc documentation for said API's
+- src/part1.java - Template code for economic growth plot (part 1)
+- src/part2.java - Template code for global trade graph (part 2)
+- src/part3.java - Template code for purchase orders (part 3)
+- txt/orders - Text file containing purchase orders (needed for part 3)
